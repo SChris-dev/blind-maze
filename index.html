@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CLIENT SIDE - Blind Maze Soal Nasional</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    
+    <!-- main menu -->
+    <div id="mainMenu">
+        <h1 style="text-align: center;">Blind Maze</h1>
+        <input type="text" id="usernameInput" placeholder="Enter name">
+        <button id="startBtn">Start</button>
+        <div class="options">
+            <button id="leaderboardBtn">Leaderboard</button>
+            <button id="instructionBtn">Show Instruction</button>
+        </div>
+    </div>
+
+    <!-- leaderboard -->
+    <div id="leaderBoard" style="display: none;">
+        <table id="score">
+            <tr>
+                <th>#</th>
+                <th>Name</th>
+                <th>Score</th>
+            </tr>
+        </table>
+    </div>
+
+    <!-- instruction -->
+    <div id="instruction" style="display: none;">
+        <div class="inst">
+            <h1>Instructions</h1>
+            <p>1. Input your name and click start button</p>
+            <p>2. Use memorizing time to memorize the way to finish</p>
+            <p>3. Move your character to the finish without hitting the wall</p>
+            <p>4. Hitting the wall or running out of time will decrease the number of lives</p>
+            <p>5. If you don't have lives left, game over</p>
+        </div>
+        <button id="closeInstruction">X</button>
+    </div>
+
+    <!-- canvas -->
+    <div id="gameContainer" style="display: none;">
+        <h1 style="text-align: center;">Blind Maze</h1>
+        <div class="stats">
+            <p>Round <span id="roundText">1</span></p>
+            <div class="timer-display">
+                <span id="timerStatusMemo">Memorizing Time</span>
+                <span id="timerStatusMove" style="display: none;">Move Time</span>
+                <span id="timerText">10s</span>
+            </div>
+            <p>Lives <span id="livesText">5</span></p>
+        </div>
+        <canvas id="canvas"></canvas>
+    </div>
+
+    <!--  game over -->
+    <div id="gameOverContainer" style="display: none;">
+        <h1>GAME OVER!</h1>
+        <p>Username: <span id="usernameText"></span></p>
+        <p>Stage Number: <span id="gameOverStageText"></span></p>
+        <p></p>
+    </div>
+
+    <script src="script.js"></script>
+    <script src="menu.js"></script>
+</body>
+</html>
