@@ -72,9 +72,15 @@ tr th {
     padding: 10px;
 }
 
+td {
+    border: 1px solid white;
+    padding: 10px;
+}
+
 /* instruction */
 
 #instruction {
+    display: flex;
     position: absolute;
     background-color: #000000;
     border: 1px solid white;
@@ -84,6 +90,16 @@ tr th {
     justify-content: space-between;
     align-items: baseline;
     font-size: 12px;
+    top: -200px;
+    left: 50%;
+    transform: translateX(-50%);
+    opacity: 0;
+    transition: .5s ease all;
+}
+
+#instruction.show {
+    top: 230px;
+    opacity: 1;
 }
 
 /* canvas */
@@ -91,10 +107,6 @@ tr th {
 #canvas {
     border: 1px solid white;
 }
-
-/* #gameContainer {
-    flex-direction: column;
-} */
 
 #gameContainer p {
     font-size: 12px;
@@ -131,4 +143,49 @@ tr th {
     justify-content: center;
     flex-direction: column;
     align-items: center;
+}
+
+.misc-display {
+    display: flex;
+    flex-direction: column;
+}
+.emptyDiv {
+    height: 20px;
+    width: 1px;
+}
+
+#hintText {
+    position: absolute;
+    margin-top: 30px;
+    color: #3342B3;
+    cursor: pointer;
+}
+
+/* gameover */
+
+#gameOverContainer {
+    flex-direction: column;
+    justify-content: center;
+    position: absolute;
+    background-color: #000000;
+    border: 1px solid white;
+    padding: 50px;
+    gap: 20px;
+}
+
+#gameOverContainer .buttons {
+    display: flex;
+    justify-content: space-between;
+}
+
+#gameOverContainer .buttons button#cancelBtn {
+    background-color: transparent;
+    border: 1px solid #3342B3;
+    color: #3342B3;
+}
+
+#gameOverContainer .buttons button#cancelBtn:hover {
+    background-color: #3342B3;
+    border: 1px solid transparent;
+    color: white;
 }

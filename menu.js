@@ -1,3 +1,10 @@
+// set the default leaderboard
+let leadering = localStorage.getItem('leaderboard');
+
+if (!leadering) {
+    localStorage.setItem('leaderboard', JSON.stringify([{name: 'schris', stage: 29}]));
+}
+
 // buttons
 const startBtn = document.getElementById('startBtn');
 const leaderboardBtn = document.getElementById('leaderboardBtn');
@@ -15,6 +22,9 @@ const gameOverContainer = document.getElementById('gameOverContainer');
 // input
 const usernameInput = document.getElementById('usernameInput');
 
+// gameover stuff
+const usernameText = document.getElementById('usernameText');
+const gameOverStageText = document.getElementById('gameOverStageText');
 
 // start game
 startBtn.addEventListener('click', () => {
@@ -35,6 +45,15 @@ startBtn.addEventListener('click', () => {
 
 })
 
+// show instruction
+instructionBtn.addEventListener('click', () => {
+    instruction.classList.add('show');
+});
+
+// close instruction
+closeInstruction.addEventListener('click', () => {
+    instruction.classList.remove('show');
+});
 
 // show leaderboard
 leaderboardBtn.addEventListener('click', () => {
@@ -45,13 +64,19 @@ leaderboardBtn.addEventListener('click', () => {
     }
 });
 
-// show instruction
-instructionBtn.addEventListener('click', () => {
-    instruction.style.display = 'flex';
-})
+// leaderboard system
+let leaderboardDisplay = JSON.parse(localStorage.getItem('leaderboard'))
+leaderboardDisplay = leaderboardDisplay.sort((a, b) => {
+    return b.stage - a.stage
+});
 
-// close instruction
-closeInstruction.addEventListener('click', () => {
-    instruction.style.display = 'none';
-})
+const leaderboardTable = document.getElementById('leaderboardTable');
+
+leaderboardDisplay.forEach((val, index) => {
+    const row = document.createElement('tr');
+    row.innerHTML = `<td>${index + 1}</td>
+                    <td>${val.name}</td>
+                    <td>${val.stage}</td>`
+    leaderboardTable.appendChild(row);
+});
 

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CLIENT SIDE - Blind Maze Soal Nasional</title>
+    <title>CLIENT SIDE - Blind Maze</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -21,17 +21,18 @@
 
     <!-- leaderboard -->
     <div id="leaderBoard" style="display: none;">
-        <table id="score">
+        <h3>Leaderboard</h3>
+        <table id="leaderboardTable">
             <tr>
                 <th>#</th>
                 <th>Name</th>
-                <th>Score</th>
+                <th>Stage</th>
             </tr>
         </table>
     </div>
 
     <!-- instruction -->
-    <div id="instruction" style="display: none;">
+    <div id="instruction">
         <div class="inst">
             <h1>Instructions</h1>
             <p>1. Input your name and click start button</p>
@@ -53,7 +54,11 @@
                 <span id="timerStatusMove" style="display: none;">Move Time</span>
                 <span id="timerText">10s</span>
             </div>
-            <p>Lives <span id="livesText">5</span></p>
+            <div class="misc-display">
+                <p>Lives <span id="livesText">5</span></p>
+                <div class="emptyDiv"></div>
+                <p id="hintText">Hint?</p>
+            </div>
         </div>
         <canvas id="canvas"></canvas>
     </div>
@@ -62,8 +67,11 @@
     <div id="gameOverContainer" style="display: none;">
         <h1>GAME OVER!</h1>
         <p>Username: <span id="usernameText"></span></p>
-        <p>Stage Number: <span id="gameOverStageText"></span></p>
-        <p></p>
+        <p>Stage: <span id="gameOverStageText"></span></p>
+        <div class="buttons">
+            <button id="cancelBtn">Cancel</button>
+            <button id="saveBtn">Save Score</button>
+        </div>
     </div>
 
     <script src="script.js"></script>
