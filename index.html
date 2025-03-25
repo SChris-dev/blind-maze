@@ -3,78 +3,62 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CLIENT SIDE - Blind Maze</title>
+    <title>BlindMaze</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
     
-    <!-- main menu -->
-    <div id="mainMenu">
-        <h1 style="text-align: center;">Blind Maze</h1>
-        <input type="text" id="usernameInput" placeholder="Enter name">
+    <div id="menuContainer">
+        <img src="./img/logo.png" alt="">
+        <input type="text" id="usernameInput" placeholder="Enter Username">
         <button id="startBtn">Start</button>
-        <div class="options">
-            <button id="leaderboardBtn">Leaderboard</button>
-            <button id="instructionBtn">Show Instruction</button>
+        <div class="menu-group-bottom">
+            <p id="leaderboardBtn">Leaderboard</p>
+            <p id="instructionBtn">Show instruction</p>
         </div>
     </div>
 
-    <!-- leaderboard -->
-    <div id="leaderBoard" style="display: none;">
-        <h3>Leaderboard</h3>
+    <div id="leaderboardContainer">
+        <h2>Leaderboard</h2>
         <table id="leaderboardTable">
             <tr>
                 <th>#</th>
                 <th>Name</th>
                 <th>Stage</th>
             </tr>
+            
         </table>
     </div>
 
-    <!-- instruction -->
-    <div id="instruction">
-        <div class="inst">
-            <h1>Instructions</h1>
+    <div id="instructionContainer">
+        <div class="instruction-content">
+            <h2>Instructions</h2>
             <p>1. Input your name and click start button</p>
-            <p>2. Use memorizing time to memorize the way to finish</p>
-            <p>3. Move your character to the finish without hitting the wall</p>
+            <p>2. Use the memorizing time to memorize the way to finish</p>
+            <p>3. Move your character to the finish square without hitting the wall</p>
             <p>4. Hitting the wall or running out of time will decrease the number of lives</p>
             <p>5. If you don't have lives left, game over</p>
         </div>
-        <button id="closeInstruction">X</button>
+        <p id="closeInstructionBtn">X</p>
     </div>
 
-    <!-- canvas -->
-    <div id="gameContainer" style="display: none;">
-        <h1 style="text-align: center;">Blind Maze</h1>
-        <div class="stats">
+    <div id="gameContainer">
+        <img src="./img/logo.png" alt="" width="200">
+        <div class="game-stats">
             <p>Round <span id="roundText">1</span></p>
-            <div class="timer-display">
-                <span id="timerStatusMemo">Memorizing Time</span>
-                <span id="timerStatusMove" style="display: none;">Move Time</span>
-                <span id="timerText">10s</span>
+            <div class="timer-container">
+                <span id="timerStatus">Memorizing Time:</span>
+                <b><span id="timerText">10s</span></b>
             </div>
-            <div class="misc-display">
-                <p>Lives <span id="livesText">5</span></p>
-                <div class="emptyDiv"></div>
-                <p id="hintText">Hint?</p>
+            <div class="indicator-container">
+                <span id="liveStatus"></span>
+                <p id="hintButton">Hint?</p>
             </div>
         </div>
         <canvas id="canvas"></canvas>
     </div>
-
-    <!--  game over -->
-    <div id="gameOverContainer" style="display: none;">
-        <h1>GAME OVER!</h1>
-        <p>Username: <span id="usernameText"></span></p>
-        <p>Stage: <span id="gameOverStageText"></span></p>
-        <div class="buttons">
-            <button id="cancelBtn">Cancel</button>
-            <button id="saveBtn">Save Score</button>
-        </div>
-    </div>
-
-    <script src="script.js"></script>
+    
     <script src="menu.js"></script>
+    <script src="script.js"></script>
 </body>
 </html>

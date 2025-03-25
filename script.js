@@ -1,401 +1,415 @@
-// canvas
 const canvas = document.getElementById('canvas');
 const ctx = canvas.getContext('2d');
-canvas.width = 400;
-canvas.height = 400;
 
-const cWidth = canvas.width;
-const cHeight = canvas.height;
+canvas.width = 500;
+canvas.height = 500;
 
-// game text
+// texts
+const roundText = document.getElementById('roundText');
+const timerStatus = document.getElementById('timerStatus');
 const timerText = document.getElementById('timerText');
-const timerStatusMemo = document.getElementById('timerStatusMemo');
-const timerStatusMove = document.getElementById('timerStatusMove');
-const livesText = document.getElementById('livesText');
-const stageText = document.getElementById('roundText');
-const hintText = document.getElementById('hintText');
+const liveStatus = document.getElementById('liveStatus');
+const hintButton = document.getElementById('hintButton');
 
-// game variables
-const cellSize = 40;
-let running = false;
-let username;
-let lives = 5;
-let stageCounter = 1;
-let timerInterval;
-let memorizeTimer = 10;
-let moveTimer = 20;
-let movePlayer = false;
-let exitPosition;
-let hintTimer;
-let hintInterval;
-let hintUsed = false;
+// variables
 
-let grid = [];
-const rows = Math.floor(cHeight / cellSize) + 1;
-const cols = Math.floor(cWidth / cellSize);
+const rows = 10;
+const cols = 10;
+const cellSize =  canvas.width / 10;
 
-// walls grid (set all tiles to wall)
-function setupGrid() {
-    for (let y = 0; y < rows; y++) {
-        grid[y] = [];
-        for (let x = 0; x < cols + 1; x++) {
-            grid[y][x] = {
-                visited: false,
-                wall: true,
-            };
-        }
-    }
-}
-
-// lines grid (10x10)
-function drawGrid() {
-    for (let x = 0; x <= cWidth; x += cellSize) {
-        ctx.beginPath();
-        ctx.moveTo(x, 0);
-        ctx.lineTo(x, cHeight);
-        ctx.strokeStyle = 'white';
-        ctx.stroke();
-    }
-
-    for (let y = 0; y <= cHeight; y += cellSize) {
-        ctx.beginPath();
-        ctx.moveTo(0, y);
-        ctx.lineTo(cWidth, y);
-        ctx.strokeStyle = 'white';
-        ctx.stroke();
-    }
-}
-
-// maze algorithm
-function carvePath(x, y) {
-    const directions = [
-        { x: 0, y: -1 }, // up
-        { x: 1, y: 0 },  // right
-        { x: 0, y: 1 },  // down
-        { x: -1, y: 0 }, // left
-    ];
-
-    directions.sort(() => Math.random() - 0.5);
-
-    for (let direction of directions) {
-        const nx = x + direction.x * 2;
-        const ny = y + direction.y * 2;
-
-        if (
-            nx >= 0 &&
-            ny >= 0 &&
-            nx < cols - 1 &&
-            ny < rows &&
-            !grid[ny][nx].visited
-        ) {
-            grid[ny][nx].visited = true;
-            grid[y + direction.y][x + direction.x].wall = false; // remove wall between current cell and next cell
-            grid[ny][nx].wall = false; // carve path
-            carvePath(nx, ny);
-        }
-    }
-}
-
-// maze generation
-function generateMaze() {
-    setupGrid();
-    const startX = 1;
-    const startY = 0;
-
-    grid[startY][startX].visited = true;
-    carvePath(startX, startY);
-}
-
-// random walls for confusing player
-function addRandomWalls() {
-    for (let y = 0; y < rows; y++) {
-        for (let x = 0; x < cols + 1; x++) {
-            if (!grid[y][x].visited && Math.random() < 0.4) {
-                grid[y][x].wall = true;
-            }
-        }
-    }
-}
-
-// maze drawing visualization
-function drawMaze() {
-    for (let y = 0; y < rows; y++) {
-        for (let x = 0; x < cols; x++) {
-            const cell = grid[y][x];
-            
-            if (memorizeTimer > 0) {
-                ctx.fillStyle = cell.wall ? 'transparent' : 'lightgray';
-                ctx.fillRect(x * cellSize, y * cellSize, cellSize, cellSize);
-            }
-
-            if (hintTimer > 0) {
-                ctx.fillStyle = cell.wall ? 'transparent' : 'lightgray';
-                ctx.fillRect(x * cellSize, y * cellSize, cellSize, cellSize);
-            }
-        }
-    }
-}
-
-// player variable
-let player = {
+const player = {
     x: 0,
-    y: Math.floor(Math.random() * (cHeight / cellSize)),
-};
-
-// player position function
-function positionPlayerGrid() {
-    const x = player.x * cellSize + cellSize / 2;
-    const y = player.y * cellSize + cellSize / 2;
-
-    return {
-        x: x,
-        y: y,
-    };
+    y: 0,
+    radius: cellSize / 4
 }
 
-// player draw
-function drawPlayer() {
-    const position = positionPlayerGrid();
-
-    ctx.beginPath();
-    ctx.fillStyle = 'red';
-    ctx.arc(position.x, position.y, 10, 0, 2 * Math.PI);
-    ctx.stroke();
-    ctx.fill();
+const initializePosition = {
+    x: 0,
+    y: 0
 }
 
-// player movements
-window.addEventListener('keyup', (e) => {
-    if (running) {
-        if (!movePlayer) {
-            console.log('You cannot move yet');
-            return;
-        }
-        const keyPress = e.key;
-    
-        if (keyPress === 'ArrowUp' && player.y > 0) {
-            player.y -= 1;
-        }
-        if (keyPress === 'ArrowRight' && player.x < cWidth / cellSize - 1) {
-            player.x += 1;
-        }
-        if (keyPress === 'ArrowLeft' && player.x > 0) {
-            player.x -= 1;
-        }
-        if (keyPress === 'ArrowDown' && player.y < cHeight / cellSize - 1) {
-            player.y += 1;
-        }
-    
-        // player hit wall
-        if (!grid[player.y][player.x].wall) {
-            alert('you hit a wall!')
-            lives -= 1;
-            livesText.innerHTML = lives;
-            gameReset();
-        }
-    
-        ctx.clearRect(0, 0, cWidth, cHeight);
-    }
-});
+let lives = 5;
+let hearts = Array(lives).fill("❤️");
 
-// memorize timer
-function timerProgressMemorize() {
-    movePlayer = false;
-    timerStatusMemo.style.display = 'block';
-    timerStatusMove.style.display = 'none';
-    timerInterval = setInterval(() => {
-        if (memorizeTimer > 0) {
-            memorizeTimer -= 1;
-            timerText.innerHTML = memorizeTimer + 's';
-            console.log(`Memorize time: ${memorizeTimer}`);
-        } else {
-            clearInterval(timerInterval);
-            timerProgressMove();
+function updateLivesDisplay() {
+    liveStatus.innerHTML = hearts.join(" ");
+}
+
+let roundCount = 1;
+let memorizingTimer = 10;
+let moveTimer = 20;
+let hintTimer = 1;
+let visible = false;
+let hintInterval;
+let memorizeInterval;
+let moveInterval;
+
+function startMemorize() {
+    memorizingTimer = 10;
+    timerText.innerHTML = memorizingTimer + 's';
+    timerStatus.style.backgroundColor = '#470000';
+    timerStatus.style.borderColor = 'red';
+    memorizeInterval = setInterval(() => {
+        memorizingTimer--;
+        timerText.innerHTML = memorizingTimer + 's';
+
+        if (memorizingTimer <= 0) {
+            clearInterval(memorizeInterval);
+            startMove();
         }
     }, 1000);
 }
 
-// move timer
-function timerProgressMove() {
-    timerInterval = setInterval(() => {
-        if (moveTimer > 0) {
-            timerStatusMemo.style.display = 'none';
-            timerStatusMove.style.display = 'block';
-            movePlayer = true;
-            moveTimer -= 1;
-            timerText.innerHTML = moveTimer + 's';
-            console.log(`Move time: ${moveTimer}`);
-        } else {
-            clearInterval(timerInterval);
-            alert('you ran out of time!')
-            lives -= 1;
-            livesText.innerHTML = lives;
-            gameReset();
-            moveTimer = 20;
-            timerProgressMove();
-        }
-    }, 1000);
-}
-
-// hint function
-hintText.addEventListener('click', hintPressed);
-
-function hintPressed() {
-    if (!hintUsed && memorizeTimer <= 0) {
-        hintUsed = true;
-        hintTimer = 1;
-        hintInterval = setInterval(() => {
-            if (hintTimer > 0) {
-                hintTimer -= 1;
-                console.log(`Hint timer: ${hintTimer}`);
-            } else {
-                clearInterval(hintInterval);
-            }
-        }, 1000);
-    }
-}
-
-// spawn exit before drawing
-function spawnExit() {
-    const exitX = cols - 1;
-    const exitY = Math.floor(Math.random() * (rows - 1));
-
-    return {
-        x: exitX * cellSize,
-        y: exitY * cellSize,
-    }
-}
-
-// draw the exit (finish point)
-function drawExit() {
-
-    ctx.fillStyle = 'yellow';
-    ctx.beginPath();
-    ctx.fillRect(exitPosition.x, exitPosition.y, cellSize, cellSize);
-    ctx.closePath();
-}
-
-// start the game
-function gameStart() {
-    running = true;
-    memorizeTimer = 10;
+function startMove() {
+    timerStatus.innerHTML = 'Move Time:'
     moveTimer = 20;
-    lives = 5;
-    stageCounter = 1;
-    movePlayer = false;
-    generateMaze();
-    addRandomWalls();
-    exitPosition = spawnExit();
+    timerText.innerHTML = moveTimer + 's';
+    timerStatus.style.backgroundColor = '#000b47';
+    timerStatus.style.borderColor = '#2b00ff';
+    moveInterval = setInterval(() => {
+        moveTimer--;
+        timerText.innerHTML = moveTimer + 's';
 
-    gameLoop();
-    drawPlayer();
-    timerProgressMemorize();
+        if (moveTimer <= 0) {
+            loseLife();
+            alert(`You ran out of time! Lives remaining: ${lives}`);
+            moveTimer = 20;
+            
+            if (lives > 0) {
+                resetPlayerPosition();
+            } else {
+                clearInterval(moveInterval);
+                gameOver();
+            }
+        }
+    }, 1000);
 }
 
-// game loop
-function gameLoop() {
-    if (running) {
-        ctx.clearRect(0, 0, cWidth, cHeight);
-        drawGrid();
-        drawMaze();
-        drawExit();
-        drawPlayer();
-        playerWin();
-        requestAnimationFrame(gameLoop);
+function hintStart() {
+    hintButton.style.display = 'none';
+    visible = true;
+    hintInterval = setInterval(() => {
+        hintTimer--;
+
+        if (hintTimer < 0) {
+            visible = false;
+            clearInterval(hintInterval);
+        }
+    }, 1000)
+}
+
+hintButton.addEventListener('click', hintStart);
+
+function loseLife() {
+    if (hearts.length > 0) {
+        hearts.pop();
+        updateLivesDisplay();
     }
 
-    if (lives <= 0) {
-        running = false;
+    if (hearts.length === 0) {
         gameOver();
     }
 }
 
-// function if the player has reached the finish point
-function playerWin() {
-    const playerPixelX = player.x * cellSize;
-    const playerPixelY = player.y * cellSize;
+const maze = [];
 
-    if (playerPixelX === exitPosition.x && playerPixelY === exitPosition.y) {
-        alert('You win! Move to the next stage...');
-        stageCounter += 1;
-        stageText.innerHTML = stageCounter;
-        nextStage();
+const exit = {
+    x: 0,
+    y: 0
+};
+
+function drawGrid() {
+    for (let row = 0; row < rows; row++) {
+        for (let col = 0; col < cols; col++) {
+            ctx.strokeWidth = 1;
+            ctx.strokeStyle = 'white';
+            ctx.fillStyle = 'black';
+
+            ctx.strokeRect(col * cellSize, row * cellSize, cellSize, cellSize);
+        }
     }
 }
 
-// moving to the next stage
-function nextStage() {
-    clearInterval(timerInterval);
-    memorizeTimer = 10;
-    moveTimer = 20;
+
+function initializeMaze() {
+    do {
+        for (let row = 0; row < rows; row++) {
+            maze[row] = [];
+            for (let col = 0; col < cols; col++) {
+                maze[row][col] = (Math.random() < 0.3 && !(row === 0 && col === 0) && !(row === rows - 1 && col === cols - 1)) ? 1 : 0;
+            }
+        }
+    } while (!isMazeSolvable());
+}
+
+function isMazeSolvable() {
+    const queue = [[0, 0]];
+    const visited = new Set();
+    visited.add('0,0');
+
+    const directions = [
+        [0, 1],   
+        [1, 0],   
+        [-1, 0],  
+        [0, -1]   
+    ];
+
+    while (queue.length > 0) {
+        const [r, c] = queue.shift();
+
+        if (r === rows - 1 && c === cols - 1) return true;
+
+        for (const [dr, dc] of directions) {
+            const newRow = r + dr;
+            const newCol = c + dc;
+            const key = `${newRow},${newCol}`;
+
+            if (newRow >= 0 && newRow < rows && newCol >= 0 && newCol < cols &&
+                maze[newRow][newCol] === 0 && !visited.has(key)) {
+                queue.push([newRow, newCol]);
+                visited.add(key);
+            }
+        }
+    }
+
+    return false;
+}
+
+function findPossibleNextCells(currentRow, currentCol) {
+    const possibleCells = [
+        { newRow: currentRow - 1, newCol: currentCol },
+        { newRow: currentRow, newCol: currentCol + 1 },
+        { newRow: currentRow + 1, newCol: currentCol },
+        { newRow: currentRow, newCol: currentCol - 1 }
+    ];
+
+    return possibleCells.filter(cell => 
+        cell.newRow >= 0 && cell.newRow < rows &&
+        cell.newCol >= 0 && cell.newCol < cols &&
+        maze[cell.newRow][cell.newCol] === 0
+    );
+}
+
+function drawMaze() {
+    ctx.fillStyle = 'gray';
+    for (let row = 0; row < rows; row++) {
+        for (let col = 0; col < cols; col++) {
+            if (maze[row][col] === 1) {
+                ctx.fillRect(col * cellSize, row * cellSize, cellSize, cellSize);
+            } else if (memorizingTimer <= 0 && visible === false) {
+                ctx.fillStyle = 'black';
+                ctx.fillRect(col * cellSize, row * cellSize, cellSize, cellSize)
+            }
+        }
+    }
+}
+
+
+function setPlayerStart() {
+    let validStartPositions = [];
+
+    for (let row = 0; row < rows; row++) {
+        if (maze[row][0] === 0) {
+            validStartPositions.push(row);
+        }
+    }
+
+    if (validStartPositions.length === 0) {
+        console.error("No valid start position found!");
+        return;
+    }
+
+    let startRow = validStartPositions[Math.floor(Math.random() * validStartPositions.length)];
+
     player.x = 0;
-    player.y = Math.floor(Math.random() * (cHeight / cellSize));
-    ctx.clearRect(0, 0, cWidth, cHeight);
-    generateMaze();
-    addRandomWalls();
-    exitPosition = spawnExit();
+    player.y = startRow * cellSize;
+    initializePosition.x = player.x;
+    initializePosition.y = player.y;
+}
+
+function resetPlayerPosition() {
+    player.x = initializePosition.x;
+    player.y = initializePosition.y;
+    
+    // if (lives <= 0) {
+    //     gameOver();
+    // }
+}
+
+function setExit() {
+    let validExitPositions = [];
+
+    for (let row = 0; row < rows; row++) {
+        if (maze[row][cols - 1] === 0) {
+            validExitPositions.push(row);
+        }
+    }
+
+    if (validExitPositions.length === 0) {
+        console.error("No valid exit position found!");
+        return;
+    }
+
+    let exitRow = validExitPositions[Math.floor(Math.random() * validExitPositions.length)];
+
+    exit.x = (cols - 1) * cellSize;
+    exit.y = exitRow * cellSize;
+}
+
+
+function drawPlayer() {
+    ctx.fillStyle = 'red';
+    
+    ctx.beginPath();
+    ctx.arc(player.x + cellSize / 2, player.y + cellSize / 2, player.radius, 0, 2 * Math.PI);
+    ctx.fill();
+}
+
+function drawExit() {
+    ctx.save();
+
+    ctx.strokeStyle = 'yellow';
+    ctx.lineWidth = 8;
+
+    ctx.beginPath();
+    ctx.moveTo(exit.x + cellSize, exit.y);
+    ctx.lineTo(exit.x + cellSize, exit.y + cellSize);
+    ctx.stroke();
+
+    ctx.restore();
+}
+
+function handleMovement(e) {
+
+    if (memorizingTimer <= 0) {
+        let newX = player.x;
+        let newY = player.y;
+    
+        switch(e.key) {
+            case 'ArrowDown':
+                newY += cellSize;
+                break;
+            case 'ArrowUp':
+                newY -= cellSize;
+                break;
+            case 'ArrowRight':
+                newX += cellSize;
+                break;
+            case 'ArrowLeft':
+                newX -= cellSize;
+                break;
+        }
+    
+        const newRow = Math.floor(newY / cellSize);
+        const newCol = Math.floor(newX / cellSize);
+    
+        if (newRow < 0 || newRow >= rows || newCol < 0 || newCol >= cols || maze[newRow][newCol] === 1) {
+            alert('hit wall')
+    
+            loseLife();
+            resetPlayerPosition();
+            return;
+        }
+    
+        player.x = newX;
+        player.y = newY;
+    
+        if (player.x === exit.x && player.y === exit.y) {
+            alert('Congratulations! You escaped the maze!');
+            nextRound();
+        }
+    } 
+}
+
+
+
+function gameLoop() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    drawMaze();
+    drawGrid();
     drawPlayer();
+    drawExit();
+
+    document.addEventListener('keyup', handleMovement);
+
+
+    requestAnimationFrame(gameLoop);
+}
+
+function gameStart() {
+    lives = 5;
+    hearts = Array(lives).fill("❤️");   
+    roundCount = 1;
+    initializeMaze();
+    setPlayerStart();
+    setExit();
+    startMemorize();
+    updateLivesDisplay();
+    
+
     gameLoop();
-    timerProgressMemorize();
 }
 
-// reset the game if the player hit a wall or running out of time
-function gameReset() {
-    
-    player.x = 0;
-    player.y = Math.floor(Math.random() * (cHeight / cellSize));
-    
-    ctx.clearRect(0, 0, cWidth, cHeight);
-}
-
-// gameover pop up screen, if the player has no live left
 function gameOver() {
-    clearInterval(timerInterval);
-    gameOverContainer.style.display = 'flex';
-    usernameText.innerHTML = username;
-    gameOverStageText.innerHTML = stageCounter;
+    clearInterval(moveInterval);
+    clearInterval(memorizeInterval);
+    let result = confirm(`
+        Game Over!
+        Your name: ${usernameInput.value}
+        Stage: ${roundCount}
+        Save Score?`);
+
+    if (result) {
+        saveScore();
+    } else {
+        console.log('not saved');
+    }
+
+    gameContainer.style.display = 'none';
+    menuContainer.style.display = 'flex';
+
 }
 
-// savescore button and cancel to save score button
-const saveScoreBtn = document.getElementById('saveBtn');
-const cancelBtn = document.getElementById('cancelBtn');
+function nextRound() {
+    roundCount++;
+    roundText.innerHTML = roundCount;
 
-cancelBtn.addEventListener('click', () => {
-    gameOverContainer.style.display = 'none';
-    gameContainer.style.display = 'none';
-    mainMenu.style.display = 'flex';
-})
+    clearInterval(moveInterval);
+    clearInterval(memorizeInterval);
+    moveTimer = 20;
+    memorizingTimer = 10;
+    timerStatus.innerHTML = 'Memorizing Time:'
+    initializeMaze();
+    setPlayerStart();
+    setExit();
+    startMemorize();
+    updateLivesDisplay();
 
-saveScoreBtn.addEventListener('click', saveScore);
+    gameLoop();
+}
 
-// saving score function (and update their score if available)
 function saveScore() {
-    alert('username and score successfully saved!');
-    gameOverContainer.style.display = 'none';
-    gameContainer.style.display = 'none';
-    mainMenu.style.display = 'flex';
-
-    let leaderboard = JSON.parse(localStorage.getItem('leaderboard')) || [];
+    let leaderboard =  JSON.parse(localStorage.getItem('leaderboard')) || [];
 
     if (leaderboard) {
         let usernameHighScore = leaderboard.find(function (val) {
-            return val.name == usernameInput.value
+            return val.name === usernameInput.value;
         });
 
         if (!usernameHighScore) {
             leaderboard.push({
                 name: usernameInput.value,
-                stage: stageCounter
+                stage: roundCount
             });
-        } 
-        else {
-            usernameHighScore.stage = Math.max(usernameHighScore.stage, stageCounter);
+        } else {
+            usernameHighScore.stage = Math.max(usernameHighScore.stage, roundCount);
         }
     }
     else {
         localStorage.setItem('leaderboard', JSON.stringify({
             name: usernameInput.value,
-            stage: stageCounter
+            stage: roundCount
         }));
         return;
     }

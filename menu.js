@@ -1,71 +1,49 @@
-// set the default leaderboard
-let leadering = localStorage.getItem('leaderboard');
+const menuContainer = document.getElementById('menuContainer');
+const leaderboardContainer = document.getElementById('leaderboardContainer');
+const instructionContainer = document.getElementById('instructionContainer');
+const gameContainer = document.getElementById('gameContainer');
 
-if (!leadering) {
-    localStorage.setItem('leaderboard', JSON.stringify([{name: 'schris', stage: 29}]));
-}
-
-// buttons
+const usernameInput = document.getElementById('usernameInput');
 const startBtn = document.getElementById('startBtn');
+startBtn.disabled = true;
 const leaderboardBtn = document.getElementById('leaderboardBtn');
 const instructionBtn = document.getElementById('instructionBtn');
-const closeInstruction = document.getElementById('closeInstruction');
+const closeInstructionBtn = document.getElementById('closeInstructionBtn');
 
-// pages
-const leaderBoard = document.getElementById('leaderBoard');
-const instruction = document.getElementById('instruction');
-const gameContainer  = document.getElementById('gameContainer');
-const mainMenu = document.getElementById('mainMenu');
-const gameOverContainer = document.getElementById('gameOverContainer');
-
-
-// input
-const usernameInput = document.getElementById('usernameInput');
-
-// gameover stuff
-const usernameText = document.getElementById('usernameText');
-const gameOverStageText = document.getElementById('gameOverStageText');
-
-// start game
-startBtn.addEventListener('click', () => {
-    username = usernameInput.value;
-
-    if (username.trim() === '') {
-        alert('Please enter username')
-        return;
+leaderboardBtn.addEventListener('click', () => {
+    if (leaderboardContainer.style.display === 'none' || leaderboardContainer.style.display === '') {
+        leaderboardContainer.style.display = 'block';
+    } else {
+        leaderboardContainer.style.display = 'none';
     }
+});
 
 
-    gameContainer.style.display = 'block';
-    mainMenu.style.display = 'none';
-    leaderBoard.style.display = 'none';
-
-    gameStart();
-    running = true;
-
+instructionBtn.addEventListener('click', () => {
+    instructionContainer.classList.add('hidden');
 })
 
-// show instruction
-instructionBtn.addEventListener('click', () => {
-    instruction.classList.add('show');
+closeInstructionBtn.addEventListener('click', () => {
+    instructionContainer.classList.remove('hidden');
+})
+
+usernameInput.addEventListener('input', () => {
+    startBtn.disabled = usernameInput.value.trim() === '';
 });
 
-// close instruction
-closeInstruction.addEventListener('click', () => {
-    instruction.classList.remove('show');
+
+startBtn.addEventListener('click', () => {
+    gameContainer.style.display = 'flex';
+    menuContainer.style.display = 'none';
+    leaderboardContainer.style.display = 'none';
+    instructionContainer.style.display = 'none';
+
+    gameStart();
 });
 
-// show leaderboard
-leaderboardBtn.addEventListener('click', () => {
-    if (leaderBoard.style.display === 'block') {
-        leaderBoard.style.display = 'none';
-    } else {
-        leaderBoard.style.display = 'block';
-    }
-});
+// leaderboard
 
-// leaderboard system
-let leaderboardDisplay = JSON.parse(localStorage.getItem('leaderboard'))
+let leaderboardDisplay = JSON.parse(localStorage.getItem('leaderboard'));
 leaderboardDisplay = leaderboardDisplay.sort((a, b) => {
     return b.stage - a.stage
 });
@@ -78,5 +56,4 @@ leaderboardDisplay.forEach((val, index) => {
                     <td>${val.name}</td>
                     <td>${val.stage}</td>`
     leaderboardTable.appendChild(row);
-});
-
+})

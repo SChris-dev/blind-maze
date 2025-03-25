@@ -1,191 +1,154 @@
 body {
     margin: 0;
     padding: 0;
+    width: 100vw;
+    height: 100vh;
     display: flex;
     justify-content: center;
     align-items: center;
-    gap: 80px;
-    width: 100vw;
-    height: 100vh;
-    font-family: Arial, Helvetica, sans-serif;
-    background-color: #000000;
+    background-color: black;
     color: white;
-
+    font-family: Arial, Helvetica, sans-serif;
+    gap: 50px;
 }
 
-#mainMenu {
+* {
+    --primary-color: rgb(112, 27, 202);
+}
+
+#menuContainer {
     display: flex;
     flex-direction: column;
-    gap: 20px;
+    gap: 10px;
 }
 
-input {
-    padding: 10px;
+#menuContainer img { 
+    margin-bottom: 20px;
 }
 
-button {
-    font-family: Arial, Helvetica, sans-serif;
+#menuContainer input {
+    background-color: black;
+    border: 1px solid white;
     padding: 10px;
     border-radius: 5px;
-    background-color: #3342B3;
-    cursor: pointer;
     color: white;
-    font-weight: 700;
-    border: 1px solid transparent;
-    transition: .2s ease all;
 }
 
-button:hover {
-    background-color: transparent;
+#menuContainer button {
+    padding: 5px;
+    background-color: var(--primary-color);
+    border: none;
+    border-radius: 5px;
+    color: white;
     cursor: pointer;
-    color: #3342B3;
-    font-weight: 700;
-    border: 1px solid #3342B3;
 }
 
-#mainMenu h1 {
-    font-size: 40px;
-    font-weight: 900;
+button:disabled {
+    opacity: 0.5;
 }
 
-.options {
+#menuContainer .menu-group-bottom {
     display: flex;
     justify-content: space-between;
 }
 
-.options button {
-    border: none;
-    text-decoration: underline;
-    color: #3342B3;
-    background-color: transparent;
+#menuContainer .menu-group-bottom p {
+    color: var(--primary-color);
+    cursor: pointer;
 }
 
 /* leaderboard */
 
-table {
-    border-collapse: collapse;
+#leaderboardContainer {
+    display: none;
     width: 300px;
+    height: auto;
 }
 
-tr th {
+#leaderboardContainer table {
+    border-collapse: collapse;
+    width: 100%;
+}
+
+#leaderboardContainer table tr th{
     border: 1px solid white;
     padding: 10px;
+
 }
 
-td {
+#leaderboardContainer table tr td{
     border: 1px solid white;
     padding: 10px;
 }
 
 /* instruction */
 
-#instruction {
-    display: flex;
+#instructionContainer {
+    display: none;
     position: absolute;
-    background-color: #000000;
+    background-color: black;
     border: 1px solid white;
-    width: 500px;
-    height: 200px;
-    padding: 0px 40px;
-    justify-content: space-between;
-    align-items: baseline;
-    font-size: 12px;
-    top: -200px;
-    left: 50%;
-    transform: translateX(-50%);
-    opacity: 0;
-    transition: .5s ease all;
+    padding: 10px 20px;
+    align-items: start;
+    transform: scale(0.8);
+    opacity: 0.5;
 }
 
-#instruction.show {
-    top: 230px;
-    opacity: 1;
+.hidden {
+    display: flex !important;
+    opacity: 1 !important;
+}
+
+
+#instructionContainer #closeInstructionBtn {
+    border: 1px solid white;
+    padding: 20px;
+    cursor: pointer;
+}
+
+/* game */
+
+#gameContainer { 
+    display: none;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+#gameContainer .game-stats {
+    display: flex;
+    width: 100%;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px;
+}
+
+.game-stats .timer-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 5px;
+}
+
+#liveStatus {
+    font-size: 12px;
 }
 
 /* canvas */
 
-#canvas {
+canvas {
     border: 1px solid white;
 }
 
-#gameContainer p {
-    font-size: 12px;
-}
-
-#gameContainer .stats {
-    display: flex;
-    justify-content: space-between;
-    align-items: end;
-}
-
-#timerText {
-    font-size: 25px;
-}
-
-#timerStatusMemo {
-    font-size: 10px;
-    background-color: #360B0A;
-    border: 1px solid #7C0001;
-    padding: 5px;
+#timerStatus {
+    background-color: #470000;
+    border: 1px solid red;
     border-radius: 15px;
-}
-
-#timerStatusMove {
-    font-size: 10px;
-    background-color: #0F1171;
-    border: 1px solid #4D4E8B;
     padding: 5px;
-    border-radius: 15px;
+    
 }
 
-.timer-display {
-    display: flex;
-    justify-content: center;
-    flex-direction: column;
-    align-items: center;
-}
-
-.misc-display {
-    display: flex;
-    flex-direction: column;
-}
-.emptyDiv {
-    height: 20px;
-    width: 1px;
-}
-
-#hintText {
-    position: absolute;
-    margin-top: 30px;
-    color: #3342B3;
+#hintButton {
     cursor: pointer;
-}
-
-/* gameover */
-
-#gameOverContainer {
-    flex-direction: column;
-    justify-content: center;
-    position: absolute;
-    background-color: #000000;
-    border: 1px solid white;
-    padding: 50px;
-    gap: 20px;
-}
-
-#gameOverContainer .buttons {
-    display: flex;
-    justify-content: space-between;
-}
-
-#gameOverContainer .buttons button#cancelBtn {
-    background-color: transparent;
-    border: 1px solid #3342B3;
-    color: #3342B3;
-}
-
-#gameOverContainer .buttons button#cancelBtn:hover {
-    background-color: #3342B3;
-    border: 1px solid transparent;
-    color: white;
+    font-size: 12px;
 }
